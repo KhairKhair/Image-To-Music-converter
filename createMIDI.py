@@ -1,8 +1,9 @@
 from PIL import Image as I
 from midiutil.MidiFile import *
 from helper import round_dur, round_dur_chords, get_key
+import numpy as np
 from random import randint
-
+from gpt import ask_gpt3
 # written for 16x16 images
 # image is broken up to 3 areas. 1 area is used to generate 1st set of chords.
 # 2nd (middle area) is used to generate melody notes. # 3rd area is for 2nd set of chords.
@@ -23,18 +24,20 @@ def generateMIDI(file_path, key, tempo):
 
     img = I.open(file_path)
     # full_img is not resized
+    full_img = img
+    img = img.resize((16,16))
     pixels = img.getdata()
     avg_pixels = []
 
 
-    full_img = img
-    img = img.resize((16,16))
     height,width = img.size
 
 
     # get avg value of r,g, and b values
     for i in pixels:
         avg_pixels.append((i[0] + i[1] + i[2])/3)
+
+    print(np.shape(avg_pixels))
 
 
     # two channels, one for melody and one for chords
@@ -69,7 +72,7 @@ def generateMIDI(file_path, key, tempo):
 
         # add each chord note 
         for chord_note in key_chord(note):
-            midi.addNote(1, channel, chord_note+60-12, time, dur, 0)
+            midi.addNote(1, channel, chord_note+60-12, time, dur, randint(60,100))
 
        # time_stamps used to keep track of when chords are played
        # so that sync with melody notes is possible
@@ -77,7 +80,10 @@ def generateMIDI(file_path, key, tempo):
         time += dur
 
     for i in range(start_chord2,end_chord2):
-       a = abs(avg_pixels[i] - avg_pixels[i+1])
+       if i >= end_chord2-1:
+            a = abs(avg_pixels[i] - avg_pixels[i-1])
+       else:
+            a = abs(avg_pixels[i] - avg_pixels[i+1])
        if a > 255:
            a = 255
        elif a < -255:
@@ -87,7 +93,7 @@ def generateMIDI(file_path, key, tempo):
        note = key_note(int(avg_pixels[i]))
        dur = round_dur_chords(abs(a))
        for chord_note in key_chord(note):
-           midi.addNote(1, channel, chord_note+60-12, time, dur, 0)
+           midi.addNote(1, channel, chord_note+60-12, time, dur, randint(60,100))
 
 
 
@@ -113,6 +119,7 @@ def generateMIDI(file_path, key, tempo):
 
         note = key_note(int(avg_pixels[i]))
         dur = round_dur(abs(a))
+        dur = 1
         midi.addNote(0, channel, note, time, dur, randint(80,100))
         durations.append(dur)
         time += dur

@@ -3,14 +3,34 @@ import pygame
 import matplotlib
 matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
+import tkinter as tk
+import pretty_midi
+import pygame
 
-def play_midi(midi_file):
-    # set up midi player in pygame
+
+def play_midi(midi_file, melody_instrument, harmony_instrument):
+
+    # Load MIDI file
+    midi_data = pretty_midi.PrettyMIDI(midi_file)
+
+    # Check if the MIDI file has enough tracks
+    if len(midi_data.instruments) >= 2:
+        # Assign the melody instrument to the first track
+        midi_data.instruments[0].program = melody_instrument
+
+        # Assign the harmony instrument to the second track
+        midi_data.instruments[1].program = harmony_instrument
+
+    # Save the modified MIDI file
+    modified_midi_file = "modified_midi.mid"
+    midi_data.write(modified_midi_file)
+
+    # Initialize pygame mixer
     pygame.init()
     pygame.mixer.init()
-    pygame.mixer.music.load(midi_file)
-    # play pygame music
+    pygame.mixer.music.load(modified_midi_file)
     pygame.mixer.music.play()
+
 
 def stop_playing():
     global playing
@@ -24,7 +44,7 @@ import matplotlib.pyplot as plt
 # Global variable to control the play/stop status
 playing = True
 
-def show_pic2(root, img, full_img, durations, tempo):
+def show_pic2(root, img, full_img, durations, tempo, play_button, stop_button):
     global playing
     playing = True
 
@@ -41,7 +61,8 @@ def show_pic2(root, img, full_img, durations, tempo):
 
     # Function to handle the closing of the window
     def on_close(event):
-        pygame.mixer.music.stop()
+        global playing
+        playing = False
     fig.canvas.mpl_connect('close_event', on_close)
 
     # Set up initial display of images
@@ -53,7 +74,11 @@ def show_pic2(root, img, full_img, durations, tempo):
     for i in range(start_melody, end_melody):
         a = time.time()
         if not playing:
-            break
+            stop_button.config(state=tk.DISABLED)
+            play_button.config(state=tk.NORMAL)
+            pygame.mixer.music.stop()
+            plt.close()
+            return
 
         note_value = durations[0]
         durations = durations[1:]
@@ -66,7 +91,7 @@ def show_pic2(root, img, full_img, durations, tempo):
 
         img_display.set_data(img_array)
         plt.draw()
-        plt.pause((note_value*tempo_scalar)-0.002)
+        plt.pause((note_value*tempo_scalar)-0.003)
 
         # Wait for the duration of the note
 
@@ -74,10 +99,8 @@ def show_pic2(root, img, full_img, durations, tempo):
         img_array[y, x] = original_color
         img_display.set_data(img_array)
         plt.draw()
-        print(a-time.time())
+        print(time.time()-a)
 
-    pygame.mixer.music.stop()
-    plt.close(fig)
 
 
 

@@ -84,11 +84,6 @@ def get_key(key):
 
 
 
-
-
-
-
-
 def round_dur_chords(dur):
 	# for each range of values, return a duration
 	# chords are chosen to be longer and have less variation that melody notes
@@ -124,6 +119,22 @@ def round_dur(dur):
 	else:
 		return 0.125
 
+
+# dictionary containing instrument as key and its value as the general midi instrument
+gm = {
+    "Piano": 0,
+    "Harpsichord": 6,
+    "Organ": 19,
+    "Guitar": 24,
+    "Violin": 40,
+    "Harp": 46,
+    "String_Ensemble": 48,
+    "Choir": 52,
+    "French_Horn": 60,
+    "Oboe": 68,
+    "Flute": 73,
+    "Melodic_Tom": 117,
+}
 
 
 
