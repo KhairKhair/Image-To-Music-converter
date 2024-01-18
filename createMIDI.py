@@ -1,6 +1,7 @@
 from PIL import Image as I
 from midiutil.MidiFile import *
-from helper import round_dur, round_dur_chords, get_key
+from helper import round_dur, round_dur_chords,find_key
+from keys import key_note, key_chord
 import numpy as np
 from random import randint
 from gpt import ask_gpt3
@@ -20,7 +21,7 @@ def generateMIDI(file_path, key, tempo):
 
 
     # get key signature functions
-    key_note, key_chord= get_key(key)
+#    key_note, key_chord= get_key(key)
 
     img = I.open(file_path)
     # full_img is not resized
@@ -36,8 +37,8 @@ def generateMIDI(file_path, key, tempo):
     # get avg value of r,g, and b values
     for i in pixels:
         avg_pixels.append((i[0] + i[1] + i[2])/3)
+    find_key(avg_pixels)
 
-    print(np.shape(avg_pixels))
 
 
     # two channels, one for melody and one for chords
@@ -68,11 +69,11 @@ def generateMIDI(file_path, key, tempo):
 
 
         # get note in key signature
-        note = key_note(int(avg_pixels[i]))
+        note = key_note(int(avg_pixels[i]), key)
 
         # add each chord note 
-        for chord_note in key_chord(note):
-            midi.addNote(1, channel, chord_note+60-12, time, dur, randint(60,100))
+        for chord_note in key_chord(note, key):
+            midi.addNote(1, channel, chord_note+60-12, time, dur, randint(30,80))
 
        # time_stamps used to keep track of when chords are played
        # so that sync with melody notes is possible
@@ -90,10 +91,10 @@ def generateMIDI(file_path, key, tempo):
            a = -255
 
 
-       note = key_note(int(avg_pixels[i]))
+       note = key_note(int(avg_pixels[i]), key)
        dur = round_dur_chords(abs(a))
-       for chord_note in key_chord(note):
-           midi.addNote(1, channel, chord_note+60-12, time, dur, randint(60,100))
+       for chord_note in key_chord(note, key):
+           midi.addNote(1, channel, chord_note+60-12, time, dur, randint(30,80))
 
 
 
@@ -117,10 +118,10 @@ def generateMIDI(file_path, key, tempo):
             a = -255
 
 
-        note = key_note(int(avg_pixels[i]))
+        pre_rounded_note = int(avg_pixels[i])
+        note = key_note(pre_rounded_note, key)
         dur = round_dur(abs(a))
-        dur = 1
-        midi.addNote(0, channel, note, time, dur, randint(80,100))
+        midi.addNote(0, channel, note, time, dur, randint(85,100))
         durations.append(dur)
         time += dur
 

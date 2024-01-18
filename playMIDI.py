@@ -99,7 +99,6 @@ def show_pic2(root, img, full_img, durations, tempo, play_button, stop_button):
         img_array[y, x] = original_color
         img_display.set_data(img_array)
         plt.draw()
-        print(time.time()-a)
 
 
 
