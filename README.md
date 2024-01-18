@@ -7,8 +7,8 @@ This program converts images into music by interpreting pixel colors as musical 
 
 Before running the program, ensure you have the following libraries installed. Use `pip` or `pip3` depending on your Python installation:
 
-1. `pip install tkinter` - For the graphical user interface.
-2. `pip install prettymidi` - Allows MIDI files to be played with various instrument sounds.
+1. `pip install tk` - For the graphical user interface.
+2. `pip install pretty_midi` - Allows MIDI files to be played with various instrument sounds.
 3. `pip install matplotlib` - For data visualization.
 4. `pip install pygame` - Used for sound playback and additional functionality.
 5. `pip install midiutil` - For MIDI file creation and manipulation.
