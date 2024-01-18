@@ -15,13 +15,13 @@ Before running the program, ensure you have the following libraries installed. U
 6. `pip install pillow` - For image processing.
 
 ### Instructions for Use
-
-1. Run `tinker.py`.
-2. In the Tkinter window, upload an image.
-3. Choose the tempo and key signature, or use the 'Set Tempo' and 'Set Key Signature' buttons for automatic settings.
-4. Select the instrument for the melody and harmony parts.
-5. Click 'Play Music' to start the playback.
-6. Use the 'Stop Playing' button to stop the music and close the matplotlib window.
+1. change directory to same directory to where you downloaded files in main
+2. Run `tinker.py`.
+3. In the Tkinter window, upload an image.
+4. Choose the tempo and key signature, or use the 'Set Tempo' and 'Set Key Signature' buttons for automatic settings.
+5. Select the instrument for the melody and harmony parts.
+6. Click 'Play Music' to start the playback.
+7. Use the 'Stop Playing' button to stop the music and close the matplotlib window.
 
 ### How It Works
 
