@@ -4,7 +4,6 @@ from helper import round_dur, round_dur_chords,find_key
 from keys import key_note, key_chord
 import numpy as np
 from random import randint
-from gpt import ask_gpt3
 # written for 16x16 images
 # image is broken up to 3 areas. 1 area is used to generate 1st set of chords.
 # 2nd (middle area) is used to generate melody notes. # 3rd area is for 2nd set of chords.
