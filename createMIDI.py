@@ -15,9 +15,8 @@ end_melody = 12*16
 start_chord2 = 12*16
 end_chord2 = 16*16
 
-def generateMIDI(file_path, key, tempo):
+def generateMIDI(file_path, key, tempo, sync):
     # writes midi file
-
 
     # get key signature functions
 #    key_note, key_chord= get_key(key)
@@ -72,7 +71,7 @@ def generateMIDI(file_path, key, tempo):
 
         # add each chord note 
         for chord_note in key_chord(note, key):
-            midi.addNote(1, channel, chord_note+60-12, time, dur, randint(30,80))
+            midi.addNote(1, channel, chord_note+60-12, time, dur, randint(40,80))
 
        # time_stamps used to keep track of when chords are played
        # so that sync with melody notes is possible
@@ -93,7 +92,7 @@ def generateMIDI(file_path, key, tempo):
        note = key_note(int(avg_pixels[i]), key)
        dur = round_dur_chords(abs(a))
        for chord_note in key_chord(note, key):
-           midi.addNote(1, channel, chord_note+60-12, time, dur, randint(30,80))
+           midi.addNote(1, channel, chord_note+60-12, time, dur, randint(40,80))
 
 
 
@@ -104,6 +103,7 @@ def generateMIDI(file_path, key, tempo):
 
 
     time = 0
+    sync_index = []
     for i in range(start_melody, end_melody):
         # generating melody notes
 
@@ -116,10 +116,24 @@ def generateMIDI(file_path, key, tempo):
         elif a < -255:
             a = -255
 
-
         pre_rounded_note = int(avg_pixels[i])
         note = key_note(pre_rounded_note, key)
         dur = round_dur(abs(a))
+        # controls sync between melody and harmony
+        if sync != 0 and i % sync == 0 and durations and time_stamps:
+            while time_stamps[0]-time < 0:
+                # if melody is ahead of current chord, skip to next chord
+                time_stamps = time_stamps[1:]
+                if len(time_stamps) == 0:
+                    break
+            if time_stamps[0]-time > 0:
+                durations[-1] += time_stamps[0]-time
+                time = time_stamps[0]
+                time_stamps = time_stamps[sync:]
+
+            sync_index.append(i)
+
+
         midi.addNote(0, channel, note, time, dur, randint(85,100))
         durations.append(dur)
         time += dur
@@ -128,4 +142,4 @@ def generateMIDI(file_path, key, tempo):
     with open("pic.mid", "wb") as output_file:
         midi.writeFile(output_file)
 
-    return img, full_img, durations
+    return img, full_img, durations, sync_index

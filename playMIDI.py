@@ -44,7 +44,7 @@ import matplotlib.pyplot as plt
 # Global variable to control the play/stop status
 playing = True
 
-def show_pic2(root, img, full_img, durations, tempo, play_button, stop_button):
+def show_pic2(root, img, full_img, durations, tempo, play_button, stop_button, sync_index):
     global playing
     playing = True
 
@@ -87,11 +87,17 @@ def show_pic2(root, img, full_img, durations, tempo, play_button, stop_button):
         x = i % width
         y = i // width
         original_color = img_array[y, x].copy()  # Save original color
-        img_array[y, x] = [255, 255, 255]  # Change color to white for highlight
-
+        if i in sync_index:
+            img_array[y, x] = [255, 215, 0]  # Change color to white for highlight
+        else:
+            img_array[y, x] = [255, 255, 255]  # Change color to white for highlight
         img_display.set_data(img_array)
         plt.draw()
-        plt.pause((note_value*tempo_scalar)-0.003)
+        if note_value*(tempo_scalar) >= 0.003:
+            plt.pause((note_value*tempo_scalar)-0.003)
+        else:
+            plt.pause(0.000001)
+
 
         # Wait for the duration of the note
 
@@ -99,6 +105,7 @@ def show_pic2(root, img, full_img, durations, tempo, play_button, stop_button):
         img_array[y, x] = original_color
         img_display.set_data(img_array)
         plt.draw()
+        print(len(durations))
 
 
 

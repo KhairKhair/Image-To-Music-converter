@@ -14,55 +14,63 @@ import matplotlib.pyplot as plt
 file_path = None
 def open_file():
 # chooes and open the image file
-	global file_path
-	f_types = [('Jpg Files', '*.jpg'),('PNG Files','*.png'), ('jpeg Files', '*.jpeg')]    
-	file_path = filedialog.askopenfilename(title="Select Image",filetypes=f_types)
-	if file_path:
-		play_button.config(state=tk.NORMAL)
-		image = Image.open(file_path)
-		# resizing the image to 300x300  for display purposes
-		if image.size[0] > 300 or image.size[1] > 300:
-			image = image.resize((300,100))
-		photo = ImageTk.PhotoImage(image)
-		# show the image on root instance
-		label_img.config(image=photo)
-		label_img.image = photo
+    global file_path
+    f_types = [('Jpg Files', '*.jpg'),('PNG Files','*.png'), ('jpeg Files', '*.jpeg')]    
+    file_path = filedialog.askopenfilename(title="Select Image",filetypes=f_types)
+    if file_path:
+        play_button.config(state=tk.NORMAL)
+        setScale_button.config(state=tk.NORMAL)
+        setTempo_button.config(state=tk.NORMAL)
+        image = Image.open(file_path)
+        # resizing the image to 300x300  for display purposes
+        if image.size[0] > 300 or image.size[1] > 300:
+            image = image.resize((300,100))
+        photo = ImageTk.PhotoImage(image)
+        # show the image on root instance
+        label_img.config(image=photo)
+        label_img.image = photo
+    else:
+        print("Didn't work")
+
+
 
 
 def start_playing():
-	# play music and open visualizer
-	stop_button.config(state=tk.NORMAL)
-	play_button.config(state=tk.DISABLED)
+    # play music and open visualizer
+    stop_button.config(state=tk.NORMAL)
+    play_button.config(state=tk.DISABLED)
 
 
-	# get key signature chosen by user
-	key = key_var.get()
-	# generates and save MIDI file and returns 16x16 image, full image and list containting duration of melody notes
-	tempo = scale.get()
-	img, full_img, durations = generateMIDI(file_path, key, tempo)
-	# MidiFile saved as following
-	midi_name = "pic.mid"
-	# setup and play midi file through pygame
+    # get key signature chosen by user
+    key = key_var.get()
+    # generates and save MIDI file and returns 16x16 image, full image and list containting duration of melody notes
+    tempo = scale.get()
+    sync = scale_sync.get()
+    img, full_img, durations, sync_index = generateMIDI(file_path, key, tempo, sync)
+    # MidiFile saved as following
+    midi_name = "pic.mid"
+    # setup and play midi file through pygame
 
-	play_midi(midi_name, gm[melodyInstru_var.get()], gm[harmonyInstru_var.get()])
-	# show visualizer using matplotlib
-	show_pic2(root,img, full_img, durations, tempo, play_button, stop_button)
-	stop_button.config(state=tk.DISABLED)
-	play_button.config(state=tk.NORMAL)
-	pygame.mixer.music.stop()
-	plt.close()
+    play_midi(midi_name, gm[melodyInstru_var.get()], gm[harmonyInstru_var.get()])
+    # show visualizer using matplotlib
+    show_pic2(root,img, full_img, durations, tempo, play_button, stop_button, sync_index)
+    stop_button.config(state=tk.DISABLED)
+    play_button.config(state=tk.NORMAL)
+
+    pygame.mixer.music.stop()
+    plt.close()
 
 def set_scale():
-	image = Image.open(file_path)
-	image = image.resize((16,16))
-	pixels = image.getdata()
-	avg_pixels = []
+    image = Image.open(file_path)
+    image = image.resize((16,16))
+    pixels = image.getdata()
+    avg_pixels = []
 
     # get avg value of r,g, and b values
-	for i in pixels:
-		avg_pixels.append((i[0] + i[1] + i[2])/3)
+    for i in pixels:
+        avg_pixels.append((i[0] + i[1] + i[2])/3)
 
-	key_var.set(find_key(avg_pixels))
+    key_var.set(find_key(avg_pixels))
 
 def set_tempo():
     image = Image.open(file_path)
@@ -89,9 +97,14 @@ def on_scale_change(value):
     scale.set(snapped_value)
 
 
+def on_scaleSync_change(value):
+    label_sync.config(text=("Snyc melody and chords\n every " + str(value) +" beat"))
+
+
 def create(first=True):
     global root, key_var, label_img, play_button, stop_button, scale
-    global melodyInstru_var, harmonyInstru_var
+    global melodyInstru_var, harmonyInstru_var, setScale_button, setTempo_button
+    global label_sync,scale_sync
 
     root = tk.Tk()
     root.title("Image To Music Converter")
@@ -131,11 +144,20 @@ def create(first=True):
     scale = tk.Scale(root, from_=60, to=180, orient='horizontal', command=on_scale_change, tickinterval=10, length=350)
     scale.grid(row=2, column=3, columnspan=1, padx=0, pady=0)
 
-    setScale_button = tk.Button(root, text="Set Key Signature \n (Based on Given Image)", command=set_scale)
-    setScale_button.grid(row=3, column=1, padx=10, pady=5, sticky="ew")
+    setScale_button = tk.Button(root, text="Set Key Signature \n (Based on Given Image)", command=set_scale, state=tk.DISABLED)
+    setScale_button.grid(row=3, column=0, padx=10, pady=5, sticky="ew")
 
-    setTempo_button = tk.Button(root, text="Set Tempo \n (Based on Given Image)", command=set_tempo)
-    setTempo_button.grid(row=3, column=3, padx=10, pady=5, sticky="ew")
+    setTempo_button = tk.Button(root, text="Set Tempo \n (Based on Given Image)", command=set_tempo, state=tk.DISABLED)
+    setTempo_button.grid(row=3, column=1, padx=0, pady=5, sticky="ew")
+
+
+
+    # slider to control sync of melody and harmony
+    scale_sync = tk.Scale(root, from_=0, to=24, orient='horizontal', command=on_scaleSync_change, tickinterval=2, length=300)
+    scale_sync.grid(row=3, column=3, columnspan=1, padx=0, pady=0)
+
+    label_sync = tk.Label(root, text=("Snyc melody and chords\n every " + str(scale_sync.get()) +" beat(s)" ), font=("Helvetica", 13))
+    label_sync.grid(row=3, column=2)
 
 
 
@@ -144,14 +166,14 @@ def create(first=True):
     label_scale.grid(row=4,column=0)
     melodyInstru_var = tk.StringVar(value="Piano")
     melody_menu = tk.OptionMenu(root, melodyInstru_var, "Piano", "Violin", "Harpsichord", "Organ", "Guitar",\
-    	    "Violin","Harp","String_Ensemble","Choir", "French_Horn", "Oboe", "Flute", "Melodic_Tom")
+            "Violin","Harp","String_Ensemble","Choir", "French_Horn", "Oboe", "Flute", "Melodic_Tom")
     melody_menu.grid(row=4, column=1, columnspan=1, padx=0, pady=0, sticky="ew")
 
     label_scale = tk.Label(root, text="  Harmony Instrument:  ", font=("Helvetica", 15))
     label_scale.grid(row=4,column=2, padx = 10)
     harmonyInstru_var = tk.StringVar(value="Piano")
     harmony_menu = tk.OptionMenu(root, harmonyInstru_var, "Piano", "Violin", "Harpsichord", "Organ", "Guitar",\
-    	    "Violin","Harp","String_Ensemble","Choir", "French_Horn", "Oboe", "Flute", "Melodic_Tom")
+            "Violin","Harp","String_Ensemble","Choir", "French_Horn", "Oboe", "Flute", "Melodic_Tom")
 
     harmony_menu.grid(row=4, column=3, columnspan=1, sticky="ew")
 
