@@ -75,9 +75,6 @@ def set_scale():
 def set_tempo():
     image = Image.open(file_path)
     img2 = image.resize((50,50)).getdata()
-    with open("tempo.txt", "w") as f:
-        for i in img2:
-            f.write(str(i))
     image = image.resize((16,16))
     pixels = image.getdata()
 

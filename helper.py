@@ -112,5 +112,28 @@ def find_tempo(pixels):
     return transformed_anger
 
 
+def calc_vol(rgb):
+    """
+    Convert an RGB value to a darkness score.
+
+    Parameters:
+    rgb (tuple): A tuple of (R, G, B) values (0-255).
+
+    Returns:
+    int: Darkness score (30-100), where 30 is the darkest and 100 is the lightest.
+    """
+    # Unpack the RGB values
+    r, g, b = rgb
+
+    # Calculate luminance in a way that accounts for human perception
+    luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+    # Normalize luminance to a scale of 30 (dark) to 100 (light)
+    # Assuming the luminance range is 0 (black) to 255 (white)
+    darkness_score = 100 - (luminance / 255 * 70)
+
+    return round(darkness_score)
+
+
 
 

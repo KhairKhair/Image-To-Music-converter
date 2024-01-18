@@ -22,7 +22,7 @@ def play_midi(midi_file, melody_instrument, harmony_instrument):
         midi_data.instruments[1].program = harmony_instrument
 
     # Save the modified MIDI file
-    modified_midi_file = "modified_midi.mid"
+    modified_midi_file = "pic.mid"
     midi_data.write(modified_midi_file)
 
     # Initialize pygame mixer
@@ -105,7 +105,6 @@ def show_pic2(root, img, full_img, durations, tempo, play_button, stop_button, s
         img_array[y, x] = original_color
         img_display.set_data(img_array)
         plt.draw()
-        print(len(durations))
 
 
 

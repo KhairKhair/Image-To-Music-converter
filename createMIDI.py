@@ -1,6 +1,6 @@
 from PIL import Image as I
 from midiutil.MidiFile import *
-from helper import round_dur, round_dur_chords,find_key
+from helper import round_dur, round_dur_chords,find_key,calc_vol
 from keys import key_note, key_chord
 import numpy as np
 from random import randint
@@ -37,6 +37,8 @@ def generateMIDI(file_path, key, tempo, sync):
         avg_pixels.append((i[0] + i[1] + i[2])/3)
     find_key(avg_pixels)
 
+    pixels = list(pixels)
+
 
 
     # two channels, one for melody and one for chords
@@ -68,10 +70,11 @@ def generateMIDI(file_path, key, tempo, sync):
 
         # get note in key signature
         note = key_note(int(avg_pixels[i]), key)
+        volume = calc_vol(pixels[i])
 
         # add each chord note 
         for chord_note in key_chord(note, key):
-            midi.addNote(1, channel, chord_note+60-12, time, dur, randint(40,80))
+            midi.addNote(1, channel, chord_note+60-12, time, dur, volume)
 
        # time_stamps used to keep track of when chords are played
        # so that sync with melody notes is possible
@@ -91,8 +94,9 @@ def generateMIDI(file_path, key, tempo, sync):
 
        note = key_note(int(avg_pixels[i]), key)
        dur = round_dur_chords(abs(a))
+       volume = calc_vol(pixels[i])
        for chord_note in key_chord(note, key):
-           midi.addNote(1, channel, chord_note+60-12, time, dur, randint(40,80))
+           midi.addNote(1, channel, chord_note+60-12, time, dur, volume)
 
 
 
@@ -119,6 +123,7 @@ def generateMIDI(file_path, key, tempo, sync):
         pre_rounded_note = int(avg_pixels[i])
         note = key_note(pre_rounded_note, key)
         dur = round_dur(abs(a))
+        volume = calc_vol(pixels[i])
         # controls sync between melody and harmony
         if sync != 0 and i % sync == 0 and durations and time_stamps:
             while time_stamps[0]-time < 0:
@@ -134,7 +139,8 @@ def generateMIDI(file_path, key, tempo, sync):
             sync_index.append(i)
 
 
-        midi.addNote(0, channel, note, time, dur, randint(85,100))
+        print(volume)
+        midi.addNote(0, channel, note, time, dur, volume)
         durations.append(dur)
         time += dur
 
