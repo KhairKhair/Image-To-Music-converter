@@ -1,5 +1,5 @@
 
-## Image to Music Converter
+## PicHooven: An Image to Music Converter
 
 This program converts images into music by interpreting pixel colors as musical notes and chords. It features a visualizer that highlights the progression of the melody in sync with the music.
 
