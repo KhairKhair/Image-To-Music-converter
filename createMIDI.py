@@ -92,6 +92,7 @@ def generateMIDI(file_path, key, tempo, sync):
            a = -255
 
 
+
        note = key_note(int(avg_pixels[i]), key)
        dur = round_dur_chords(abs(a))
        volume = calc_vol(pixels[i])

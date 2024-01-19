@@ -123,7 +123,10 @@ def calc_vol(rgb):
     int: Darkness score (30-100), where 30 is the darkest and 100 is the lightest.
     """
     # Unpack the RGB values
-    r, g, b = rgb
+    if len(rgb) == 4:
+        r,g,b,a = rgb
+    else:
+        r, g, b = rgb
 
     # Calculate luminance in a way that accounts for human perception
     luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b

@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import tkinter as tk
 from pretty_midi import PrettyMIDI
 import pygame
+from PIL import ImageDraw, Image
 
 
 def play_midi(midi_file, melody_instrument, harmony_instrument):
@@ -70,8 +71,35 @@ def show_pic2(root, img, full_img, durations, tempo, play_button, stop_button, s
     ax1.set_title("16x16 image")
     ax2.imshow(full_img_array)
     ax2.set_title("Full image")
+    # Ensure the image is in RGBA mode to handle transparency
+    img = img.convert("RGBA")
+    img_array = np.array(img)
+
+    # Create a new transparent layer for the line
+    overlay = Image.new('RGBA', img.size, (255, 255, 255, 0))
+    draw = ImageDraw.Draw(overlay)
+
+    # Draw a semi-transparent line
+    line_color = (255, 0, 0, 60)  # Red color with half transparency (128 out of 255)
+    draw.line((0, 4, 15, 4), fill=line_color, width=1)
+    draw.line((0, 11, 15, 11), fill=line_color, width=1)
+    draw.line((0, 4, 0, 11), fill=line_color, width=1)
+    draw.line((15, 4, 15, 11), fill=line_color, width=1)
+
+
+    # Combine original image with the transparent layer
+    img_array_combined = Image.alpha_composite(img, overlay)
+    img_array = np.array(img_array_combined)
+
+    # Update the display with the line drawn
+    img_display.set_data(img_array)
+    plt.draw()
+
+
+
 
     for i in range(start_melody, end_melody):
+
         a = time.time()
         if not playing:
             stop_button.config(state=tk.DISABLED)
@@ -88,9 +116,9 @@ def show_pic2(root, img, full_img, durations, tempo, play_button, stop_button, s
         y = i // width
         original_color = img_array[y, x].copy()  # Save original color
         if i in sync_index:
-            img_array[y, x] = [255, 215, 0]  # Change color to white for highlight
+            img_array[y, x] = [255, 215, 0, 255]  # Change color to golden for highlighting sync
         else:
-            img_array[y, x] = [255, 255, 255]  # Change color to white for highlight
+            img_array[y, x] = [255, 255, 255, 255]  # Change color to white for highlight
         img_display.set_data(img_array)
         plt.draw()
         if note_value*(tempo_scalar) >= 0.003:
