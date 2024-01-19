@@ -4,14 +4,14 @@ import matplotlib
 matplotlib.use("TkAgg")
 import matplotlib.pyplot as plt
 import tkinter as tk
-import pretty_midi
+from pretty_midi import PrettyMIDI
 import pygame
 
 
 def play_midi(midi_file, melody_instrument, harmony_instrument):
 
     # Load MIDI file
-    midi_data = pretty_midi.PrettyMIDI(midi_file)
+    midi_data = PrettyMIDI(midi_file)
 
     # Check if the MIDI file has enough tracks
     if len(midi_data.instruments) >= 2:

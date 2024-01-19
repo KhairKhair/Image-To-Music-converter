@@ -139,7 +139,6 @@ def generateMIDI(file_path, key, tempo, sync):
             sync_index.append(i)
 
 
-        print(volume)
         midi.addNote(0, channel, note, time, dur, volume)
         durations.append(dur)
         time += dur
