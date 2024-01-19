@@ -17,7 +17,7 @@ Before running the program, ensure you have the following libraries installed. U
 
 ### Instructions for Use
 1. change directory to same directory to where you downloaded files in main
-2. Run `tinker.py`.
+2. Run `PicHooven.py`.
 3. In the Tkinter window, upload an image.
 4. Choose the tempo and key signature, or use the 'Set Tempo' and 'Set Key Signature' buttons for automatic settings.
 5. Select the instrument for the melody and harmony parts.
