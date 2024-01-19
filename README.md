@@ -13,6 +13,7 @@ Before running the program, ensure you have the following libraries installed. U
 4. `pip install pygame` - Used for sound playback and additional functionality.
 5. `pip install midiutil` - For MIDI file creation and manipulation.
 6. `pip install pillow` - For image processing.
+7. `pip install --upgrade setuptools` to make sure python is setup correctly
 
 ### Instructions for Use
 1. change directory to same directory to where you downloaded files in main
